@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { AnimatePresence, motion } from "motion/react";
 import { useState } from "react";
 import { hueVar, stackLayers, type StackNode } from "@/content/resume";
@@ -66,13 +67,14 @@ export function Stack() {
                               onFocus={() => setHover({ layer: li, node: ni })}
                               onBlur={() => setHover(null)}
                               onClick={() => toggle({ layer: li, node: ni })}
-                              className="border bg-bg px-2.5 py-1 font-mono text-[12.5px] transition-colors"
+                              className="inline-flex items-center gap-2 border bg-bg px-2.5 py-1 font-mono text-[12.5px] transition-colors"
                               style={{
                                 borderColor: active ? hue : "var(--line-strong)",
                                 color: active ? hue : "var(--text)",
                                 boxShadow: active ? `inset 0 0 0 1px color-mix(in oklab, ${hue} 40%, transparent)` : undefined,
                               }}
                             >
+                              {node.logo ? <Image src={node.logo} alt="" width={16} height={16} className="h-4 w-4 object-contain" /> : null}
                               {node.name}
                             </button>
                           </li>
@@ -105,7 +107,12 @@ export function Stack() {
                   <p className="font-mono text-[11px] tracking-[0.14em] uppercase" style={{ color: hueVar[current.layer.hue] }}>
                     {current.layer.name}
                   </p>
-                  <h4 className="mt-1 font-display text-2xl font-semibold tracking-tight">{current.node.name}</h4>
+                  <h4 className="mt-1 flex items-center gap-3 font-display text-2xl font-semibold tracking-tight">
+                    {current.node.logo ? (
+                      <Image src={current.node.logo} alt="" width={32} height={32} className="h-8 w-8 object-contain" />
+                    ) : null}
+                    {current.node.name}
+                  </h4>
                   <p className="meta mt-5">used for</p>
                   <ul className="mt-2 space-y-1.5 font-mono text-[13px] text-text">
                     {current.node.usedFor.map((u) => (

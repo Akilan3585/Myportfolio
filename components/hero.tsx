@@ -6,7 +6,8 @@ import {
   useScroll,
   useTransform,
 } from "motion/react";
-import { certifications, person, site } from "@/content/resume";
+import Image from "next/image";
+import { certifications, person, runsOn, site } from "@/content/resume";
 import { DeliveryDiagram } from "./delivery-diagram";
 import { TextReveal } from "./motion/text-reveal";
 import { StatusDot } from "./section";
@@ -159,6 +160,15 @@ export function Hero() {
               <span className="hidden sm:inline">schematic</span>
             </div>
             <DeliveryDiagram />
+            <ul className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-2 border-t border-line px-1 pt-3" aria-label="Runs on">
+              <li className="meta">runs on</li>
+              {runsOn.map((t) => (
+                <li key={t.name} className="flex items-center gap-2 font-mono text-[12px] text-muted">
+                  <Image src={t.logo} alt="" width={20} height={20} className="h-5 w-5 object-contain" />
+                  {t.name}
+                </li>
+              ))}
+            </ul>
           </motion.div>
         </motion.div>
       </div>

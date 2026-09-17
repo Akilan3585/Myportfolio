@@ -315,7 +315,22 @@ export const profiles: (Link & { detail: string })[] = [
 ];
 
 /** Layered infrastructure map. Every "used for" entry comes from the résumé. */
-export type StackNode = { name: string; usedFor: string[] };
+export type StackNode = { name: string; usedFor: string[]; logo?: string };
+
+/** Logos live in public/logos. Only the four supplied files are wired here. */
+export const logos = {
+  aws: "/logos/aws.png",
+  kubernetes: "/logos/kubernetes.png",
+  argocd: "/logos/argocd.png",
+  docker: "/logos/docker.png",
+} as const;
+
+export const runsOn: { name: string; logo: string }[] = [
+  { name: "AWS", logo: logos.aws },
+  { name: "Kubernetes", logo: logos.kubernetes },
+  { name: "ArgoCD", logo: logos.argocd },
+  { name: "Docker", logo: logos.docker },
+];
 export type StackLayer = { id: string; name: string; hue: Hue; nodes: StackNode[] };
 
 export const stackLayers: StackLayer[] = [
@@ -357,9 +372,9 @@ export const stackLayers: StackLayer[] = [
     name: "Delivery",
     hue: "mint",
     nodes: [
-      { name: "Docker", usedFor: ["Containerised FoodieShare services", "5+ services at Vsphere Technologies"] },
-      { name: "Kubernetes", usedFor: ["FoodieShare on AWS EKS", "Deployments at Vsphere Technologies"] },
-      { name: "ArgoCD", usedFor: ["GitOps sync for FoodieShare", "GitOps deployments at Vsphere Technologies"] },
+      { name: "Docker", logo: logos.docker, usedFor: ["Containerised FoodieShare services", "5+ services at Vsphere Technologies"] },
+      { name: "Kubernetes", logo: logos.kubernetes, usedFor: ["FoodieShare on AWS EKS", "Deployments at Vsphere Technologies"] },
+      { name: "ArgoCD", logo: logos.argocd, usedFor: ["GitOps sync for FoodieShare", "GitOps deployments at Vsphere Technologies"] },
       { name: "GitLab CI", usedFor: ["Automated pipelines at Vsphere Technologies"] },
       { name: "Jenkins", usedFor: ["CI/CD pipelines"] },
       { name: "Maven", usedFor: ["Build automation"] },
@@ -371,7 +386,7 @@ export const stackLayers: StackLayer[] = [
     name: "Cloud & platform",
     hue: "blue",
     nodes: [
-      { name: "AWS", usedFor: ["EKS for FoodieShare", "Cloud services during the internship", "Certified Cloud Practitioner, 914 / 1000"] },
+      { name: "AWS", logo: logos.aws, usedFor: ["EKS for FoodieShare", "Cloud services during the internship", "Certified Cloud Practitioner, 914 / 1000"] },
       { name: "Vercel", usedFor: ["Aventra AI hosting", "This portfolio"] },
       { name: "Upstash", usedFor: ["Serverless Redis in the platform stack"] },
       { name: "Resend", usedFor: ["Transactional email in the platform stack"] },
