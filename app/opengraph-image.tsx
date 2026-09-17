@@ -15,8 +15,8 @@ export default function Image() {
           width: "100%",
           height: "100%",
           display: "flex",
-          background: "linear-gradient(135deg, #06080f 0%, #0a0f1c 60%, #0d1a24 100%)",
-          color: "#e9edf5",
+          background: "linear-gradient(135deg, #0a0c10 0%, #0e1116 60%, #11151b 100%)",
+          color: "#e6e8eb",
           padding: 72,
           fontFamily: "Georgia, serif",
           position: "relative",
@@ -44,9 +44,9 @@ export default function Image() {
                 width: 98,
                 height: 98,
                 borderRadius: 22,
-                border: "1.5px solid rgba(62,200,184,0.6)",
-                background: "rgba(62,200,184,0.08)",
-                color: "#3ec8b8",
+                border: "1.5px solid rgba(47,155,255,0.6)",
+                background: "rgba(47,155,255,0.08)",
+                color: "#2f9bff",
                 fontSize: 15,
                 fontFamily: "monospace",
               }}
@@ -65,8 +65,8 @@ export default function Image() {
               width: 72,
               height: 72,
               borderRadius: 20,
-              background: "linear-gradient(135deg, #3ec8b8, #ffb454)",
-              color: "#06080f",
+              background: "linear-gradient(135deg, #2f9bff, #7b86ff)",
+              color: "#0a0c10",
               fontSize: 30,
               fontWeight: 700,
             }}
@@ -74,7 +74,7 @@ export default function Image() {
             {person.initials}
           </div>
           <div style={{ display: "flex", flexDirection: "column", maxWidth: 720 }}>
-            <div style={{ fontSize: 22, color: "#3ec8b8", letterSpacing: 4 }}>{person.badge.toUpperCase()}</div>
+            <div style={{ fontSize: 22, color: "#2f9bff", letterSpacing: 4 }}>{person.badge.toUpperCase()}</div>
             <div style={{ marginTop: 14, fontSize: 64, fontWeight: 700, lineHeight: 1.05, letterSpacing: -2 }}>{person.name}</div>
             <div style={{ marginTop: 18, fontSize: 28, color: "#9aa3b8", lineHeight: 1.3 }}>
               {"MERN and Next.js apps shipped to Kubernetes on AWS with GitLab CI and ArgoCD. AWS Certified Cloud Practitioner, 914 / 1000."}

@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { Reveal } from "./motion/reveal";
+import { SectionTransition } from "./motion/section-transition";
 
 type SectionProps = {
   id: string;
@@ -9,28 +9,53 @@ type SectionProps = {
   lede?: string;
   children: ReactNode;
   className?: string;
+  /** Optional note rendered in the metadata row, e.g. "static" or "live data". */
+  note?: string;
 };
 
-/** Standard section shell: numbered eyebrow, display title, optional lede. */
-export function Section({ id, index, eyebrow, title, lede, children, className = "" }: SectionProps) {
+/**
+ * Section shell styled like a panel in a control surface: a thin top rule with
+ * mono metadata (index, label, route) and a plain sans title.
+ */
+export function Section({
+  id,
+  index,
+  eyebrow,
+  title,
+  lede,
+  children,
+  className = "",
+  note,
+}: SectionProps) {
   return (
-    <section id={id} aria-labelledby={`${id}-title`} className={`scroll-mt-24 py-24 sm:py-32 ${className}`}>
+    <section
+      id={id}
+      aria-labelledby={`${id}-title`}
+      className={`scroll-mt-20 py-20 sm:py-28 ${className}`}
+    >
       <div className="mx-auto max-w-[1240px] px-5 sm:px-8">
-        <Reveal className="max-w-[70ch]">
-          <p className="flex items-center gap-3 font-mono text-[12px] uppercase tracking-[0.2em] text-accent">
-            <span>{index}</span>
-            <span className="h-px w-8 bg-accent/50" aria-hidden />
-            <span>{eyebrow}</span>
-          </p>
+        <SectionTransition>
+          <div className="flex items-center justify-between gap-4 border-t border-line pt-4">
+            <p className="meta flex items-center gap-3 text-accent">
+              <span>[{index}]</span>
+              <span className="text-text">{eyebrow}</span>
+            </p>
+            <p className="meta hidden sm:block">
+              sec-{index} · /#{id}
+              {note ? ` · ${note}` : ""}
+            </p>
+          </div>
           <h2
             id={`${id}-title`}
-            className="mt-4 font-display text-[2.25rem] font-semibold leading-[1.05] tracking-[-0.02em] sm:text-[3rem]"
+            className="mt-6 max-w-[24ch] font-display text-[2rem] leading-[1.08] font-semibold tracking-[-0.02em] sm:text-[2.75rem]"
           >
             {title}
           </h2>
-          {lede ? <p className="mt-4 max-w-[60ch] text-lg text-muted">{lede}</p> : null}
-        </Reveal>
-        <div className="mt-12 sm:mt-16">{children}</div>
+          {lede ? (
+            <p className="mt-4 max-w-[62ch] text-[17px] text-muted">{lede}</p>
+          ) : null}
+          <div className="mt-10 sm:mt-14">{children}</div>
+        </SectionTransition>
       </div>
     </section>
   );
@@ -61,10 +86,42 @@ export function ExternalLink({
 export function Tag({ children, hue }: { children: ReactNode; hue?: string }) {
   return (
     <li
-      className="rounded-md border border-line bg-surface px-2 py-0.5 font-mono text-[11.5px] text-muted"
-      style={hue ? { borderColor: `color-mix(in oklab, ${hue} 35%, transparent)`, color: hue } : undefined}
+      className="rounded-[3px] border border-line bg-bg px-2 py-0.5 font-mono text-[11.5px] text-muted"
+      style={
+        hue
+          ? {
+              borderColor: `color-mix(in oklab, ${hue} 40%, transparent)`,
+              color: hue,
+            }
+          : undefined
+      }
     >
       {children}
     </li>
+  );
+}
+
+export function StatusDot({
+  tone = "green",
+  live = false,
+  className = "",
+}: {
+  tone?: "green" | "amber" | "blue" | "faint";
+  live?: boolean;
+  className?: string;
+}) {
+  const color =
+    tone === "green"
+      ? "text-green"
+      : tone === "amber"
+        ? "text-amber"
+        : tone === "blue"
+          ? "text-accent"
+          : "text-faint";
+  return (
+    <span
+      aria-hidden
+      className={`dot ${live ? "dot-live" : ""} ${color} ${className}`}
+    />
   );
 }

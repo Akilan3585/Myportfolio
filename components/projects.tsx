@@ -3,17 +3,19 @@ import { ProjectCard } from "./project-card";
 import { Section } from "./section";
 
 export function Projects() {
+  const live = projects.filter((p) => p.status === "live").length;
   return (
     <Section
       id="projects"
       index="03"
-      eyebrow="Work"
-      title="Built, containerised, deployed."
-      lede="Three products, each with the pipeline that gets it to users. Open a case study for the problem, the solution and how the pieces connect."
+      eyebrow="Deployed systems"
+      title="Three services, each with the path that ships it."
+      lede="Every card is a real project from the résumé: what goes in, what happens, what comes out, and the pipeline behind it. Open one for the full architecture."
+      note={`${projects.length} services · ${live} live`}
     >
-      <div className="space-y-24 sm:space-y-32">
+      <div className="space-y-6">
         {projects.map((p, i) => (
-          <ProjectCard key={p.slug} project={p} flip={i % 2 === 1} />
+          <ProjectCard key={p.slug} project={p} index={i} />
         ))}
       </div>
     </Section>

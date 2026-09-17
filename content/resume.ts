@@ -12,10 +12,17 @@ export const hueVar: Record<Hue, string> = {
 
 export type PipelineStep = { label: string; detail: string };
 
+export type ServiceStatus = "live" | "source";
+
 export type Project = {
   slug: string;
   number: string;
   title: string;
+  /** kubernetes-style service name shown in the deployed-systems cards */
+  service: string;
+  status: ServiceStatus;
+  type: string;
+  io: { input: string; process: string; output: string };
   kind: string;
   year: string;
   hue: Hue;
@@ -42,6 +49,7 @@ export type TimelineItem = {
 
 export const site = {
   url: "https://akilan-portfolio.vercel.app",
+  version: "1.0.0",
 };
 
 export const person = {
@@ -49,7 +57,7 @@ export const person = {
   initials: "AB",
   role: "DevOps and Full-Stack Engineer",
   badge: "DevOps • Cloud • Full-Stack",
-  headline: "I build apps and the pipelines that ship them.",
+  headline: "Building systems from commit → container → cluster → product.",
   subhead:
     "Containerised MERN and Next.js products, deployed to Kubernetes on AWS through GitLab CI and ArgoCD, and watched with Prometheus and Grafana. Third-year B.E. CSE (AI & ML) at Sri Eshwar College of Engineering, graduating 2027.",
   availability: "Open to DevOps and full-stack internships",
@@ -76,7 +84,6 @@ export const about = {
     { text: "Kubernetes on AWS", highlight: true },
     { text: ", and put dashboards on top so I know they are still up." },
   ],
-  labels: ["GitLab CI", "ArgoCD", "EKS", "Prometheus", "Next.js"],
   facts: [
     { label: "Focus", value: "CI/CD, Kubernetes, AWS, observability" },
     { label: "Ships with", value: "Docker, ArgoCD, React, Node, Next.js" },
@@ -85,45 +92,30 @@ export const about = {
 };
 
 export const nav = [
-  { id: "about", label: "About" },
-  { id: "skills", label: "Skills" },
+  { id: "system", label: "System" },
+  { id: "stack", label: "Stack" },
   { id: "projects", label: "Projects" },
   { id: "experience", label: "Experience" },
-  { id: "achievements", label: "Achievements" },
+  { id: "source", label: "Source" },
   { id: "contact", label: "Contact" },
 ] as const;
-
-export const skillGraph: { name: string; hue: Hue; items: string[] }[] = [
-  {
-    name: "Cloud & Ops",
-    hue: "mint",
-    items: ["AWS", "Docker", "Kubernetes", "ArgoCD", "GitLab CI", "Jenkins", "Linux"],
-  },
-  {
-    name: "Observability",
-    hue: "amber",
-    items: ["Prometheus", "Grafana", "SonarQube", "Maven"],
-  },
-  {
-    name: "Web",
-    hue: "blue",
-    items: ["React", "Next.js", "Node.js", "Express", "TypeScript", "Tailwind CSS", "REST APIs"],
-  },
-  {
-    name: "Data & Platform",
-    hue: "violet",
-    items: ["MongoDB", "PostgreSQL", "MySQL", "Supabase", "Clerk", "Vercel", "Upstash", "Resend"],
-  },
-];
 
 export const projects: Project[] = [
   {
     slug: "foodieshare",
     number: "01",
     title: "FoodieShare",
+    service: "foodieshare",
+    status: "source",
+    type: "Recipe sharing platform · MERN on AWS EKS",
+    io: {
+      input: "Recipes, photos and community posts",
+      process: "React UI → Express API → MongoDB, shipped by CI/CD and ArgoCD to EKS",
+      output: "A monitored, GitOps-managed recipe community",
+    },
     kind: "Recipe sharing platform · MERN on AWS EKS",
     year: "2025",
-    hue: "mint",
+    hue: "blue",
     metric: "GitOps",
     metricLabel: "ArgoCD-driven deploys to Kubernetes on AWS",
     problem:
@@ -147,6 +139,14 @@ export const projects: Project[] = [
     slug: "aventra-ai",
     number: "02",
     title: "Aventra AI",
+    service: "aventra-ai",
+    status: "live",
+    type: "Smart campus management platform · Next.js",
+    io: {
+      input: "Students, staff, classrooms, equipment and maintenance records",
+      process: "Clerk auth → role-based modules → Supabase with audit logs → AI recommendations",
+      output: "One secure operations console for a campus",
+    },
     kind: "Smart campus management platform · Next.js",
     year: "2025",
     hue: "violet",
@@ -172,6 +172,14 @@ export const projects: Project[] = [
     slug: "ecommerce",
     number: "03",
     title: "E-commerce Website",
+    service: "ecommerce-web",
+    status: "source",
+    type: "Full-stack storefront · MERN + REST",
+    io: {
+      input: "Products, carts, wishlists and orders",
+      process: "React storefront → REST API with auth and RBAC → MongoDB",
+      output: "A storefront where customers shop and admins manage the catalogue",
+    },
     kind: "Full-stack storefront · MERN + REST",
     year: "2025",
     hue: "amber",
@@ -181,8 +189,7 @@ export const projects: Project[] = [
       "A storefront needs customers and administrators in the same app without letting a customer touch product management or another user's orders.",
     solution:
       "A full-stack MERN e-commerce application with secure user authentication, product management, cart, wishlist and order flows over REST APIs and MongoDB. Role-Based Access Control separates user and admin privileges so administrative operations stay protected.",
-    keyFeature:
-      "RBAC enforced at the API layer, so admin routes for product management are unreachable with a customer session.",
+    keyFeature: "RBAC enforced at the API layer, so admin routes for product management are unreachable with a customer session.",
     pipeline: [
       { label: "React UI", detail: "Responsive storefront" },
       { label: "REST API", detail: "Express routes" },
@@ -305,4 +312,162 @@ export const profiles: (Link & { detail: string })[] = [
   { label: "GitHub", href: person.github, detail: "Source for every project" },
   { label: "LinkedIn", href: person.linkedin, detail: "Akilan Balraman" },
   { label: "LeetCode", href: person.leetcode, detail: "akilanb2005" },
+];
+
+/** Layered infrastructure map. Every "used for" entry comes from the résumé. */
+export type StackNode = { name: string; usedFor: string[] };
+export type StackLayer = { id: string; name: string; hue: Hue; nodes: StackNode[] };
+
+export const stackLayers: StackLayer[] = [
+  {
+    id: "application",
+    name: "Application",
+    hue: "blue",
+    nodes: [
+      { name: "React", usedFor: ["FoodieShare UI", "E-commerce storefront", "Responsive product interfaces"] },
+      { name: "Next.js", usedFor: ["Aventra AI campus platform", "This portfolio"] },
+      { name: "TypeScript", usedFor: ["Aventra AI", "This portfolio"] },
+      { name: "Tailwind CSS", usedFor: ["Aventra AI", "This portfolio"] },
+    ],
+  },
+  {
+    id: "services",
+    name: "Services",
+    hue: "violet",
+    nodes: [
+      { name: "Node.js", usedFor: ["FoodieShare API", "E-commerce API"] },
+      { name: "Express", usedFor: ["REST APIs for FoodieShare and E-commerce", "Auth and RBAC middleware"] },
+      { name: "REST APIs", usedFor: ["Product, cart, wishlist and order endpoints", "Recipe endpoints"] },
+      { name: "Clerk", usedFor: ["Authentication for Aventra AI"] },
+    ],
+  },
+  {
+    id: "data",
+    name: "Data",
+    hue: "amber",
+    nodes: [
+      { name: "MongoDB", usedFor: ["FoodieShare", "E-commerce catalogue, carts and orders"] },
+      { name: "PostgreSQL", usedFor: ["Aventra AI through Supabase"] },
+      { name: "Supabase", usedFor: ["Aventra AI data and audit logs"] },
+      { name: "MySQL", usedFor: ["Relational database work and practice"] },
+    ],
+  },
+  {
+    id: "delivery",
+    name: "Delivery",
+    hue: "mint",
+    nodes: [
+      { name: "Docker", usedFor: ["Containerised FoodieShare services", "5+ services at Vsphere Technologies"] },
+      { name: "Kubernetes", usedFor: ["FoodieShare on AWS EKS", "Deployments at Vsphere Technologies"] },
+      { name: "ArgoCD", usedFor: ["GitOps sync for FoodieShare", "GitOps deployments at Vsphere Technologies"] },
+      { name: "GitLab CI", usedFor: ["Automated pipelines at Vsphere Technologies"] },
+      { name: "Jenkins", usedFor: ["CI/CD pipelines"] },
+      { name: "Maven", usedFor: ["Build automation"] },
+      { name: "SonarQube", usedFor: ["Code quality gates in pipelines"] },
+    ],
+  },
+  {
+    id: "platform",
+    name: "Cloud & platform",
+    hue: "blue",
+    nodes: [
+      { name: "AWS", usedFor: ["EKS for FoodieShare", "Cloud services during the internship", "Certified Cloud Practitioner, 914 / 1000"] },
+      { name: "Vercel", usedFor: ["Aventra AI hosting", "This portfolio"] },
+      { name: "Upstash", usedFor: ["Serverless Redis in the platform stack"] },
+      { name: "Resend", usedFor: ["Transactional email in the platform stack"] },
+      { name: "Linux", usedFor: ["System administration at Vsphere Technologies"] },
+    ],
+  },
+  {
+    id: "observability",
+    name: "Observability",
+    hue: "amber",
+    nodes: [
+      { name: "Prometheus", usedFor: ["Metrics for services at Vsphere Technologies", "FoodieShare monitoring"] },
+      { name: "Grafana", usedFor: ["Dashboards for deployment reliability"] },
+    ],
+  },
+  {
+    id: "source",
+    name: "Source control",
+    hue: "violet",
+    nodes: [
+      { name: "Git", usedFor: ["Every project"] },
+      { name: "GitHub", usedFor: ["FoodieShare, E-commerce and the rest of the public repositories"] },
+    ],
+  },
+];
+
+/** Runtime topology used in the System Architecture section. Purpose and tech are factual. */
+export type ArchNode = {
+  id: string;
+  label: string;
+  purpose: string;
+  tech: string;
+  seenIn: string[];
+};
+
+export const architecture: ArchNode[] = [
+  { id: "user", label: "USER", purpose: "Browser traffic over HTTPS.", tech: "Any modern browser", seenIn: ["All projects"] },
+  {
+    id: "frontend",
+    label: "FRONTEND",
+    purpose: "Serves the interface and talks to the API.",
+    tech: "React · Next.js · Tailwind CSS",
+    seenIn: ["FoodieShare", "Aventra AI", "E-commerce"],
+  },
+  {
+    id: "auth",
+    label: "AUTH",
+    purpose: "Signs users in and enforces role-based access.",
+    tech: "Clerk · RBAC middleware",
+    seenIn: ["Aventra AI", "E-commerce"],
+  },
+  {
+    id: "api",
+    label: "API",
+    purpose: "Handles application requests and business rules.",
+    tech: "Node.js · Express · REST",
+    seenIn: ["FoodieShare", "E-commerce"],
+  },
+  {
+    id: "database",
+    label: "DATABASE",
+    purpose: "Stores products, recipes, users and audit logs.",
+    tech: "MongoDB · PostgreSQL (Supabase)",
+    seenIn: ["FoodieShare", "Aventra AI", "E-commerce"],
+  },
+  {
+    id: "cluster",
+    label: "CLUSTER",
+    purpose: "Runs the containerised services, synced by GitOps.",
+    tech: "Docker · Kubernetes on AWS EKS · ArgoCD",
+    seenIn: ["FoodieShare", "Vsphere Technologies"],
+  },
+  {
+    id: "observe",
+    label: "OBSERVE",
+    purpose: "Metrics and dashboards for reliability.",
+    tech: "Prometheus · Grafana",
+    seenIn: ["FoodieShare", "Vsphere Technologies"],
+  },
+];
+
+export const terminal = {
+  whoami: [
+    { cmd: "whoami", out: ["akilan-b"] },
+    { cmd: "role", out: ["DevOps and Full-Stack Engineer"] },
+    { cmd: "focus", out: ["CI/CD and GitOps", "Kubernetes on AWS", "React, Next.js and Node services", "Observability"] },
+    { cmd: "status", out: ["OPEN TO DEVOPS AND FULL-STACK INTERNSHIPS"] },
+  ],
+};
+
+export const systemEvents: { label: string; detail: string; year: string }[] = [
+  { label: "Certification issued", detail: "AWS Certified Cloud Practitioner, 914 / 1000", year: "2026" },
+  { label: "Internship completed", detail: "DevOps Intern, Vsphere Technologies", year: "2025" },
+  { label: "Hackathon placement", detail: "Top 10, SAP Hackfest (internal)", year: "2025" },
+  { label: "Award received", detail: "Third prize, Freshathon project expo", year: "2025" },
+  { label: "Certification issued", detail: "Networking Basics, Cisco", year: "2025" },
+  { label: "Hackathon placement", detail: "Top 50, SIH internal hackathon", year: "2024" },
+  { label: "Enrolled", detail: "B.E. CSE (AI & ML), Sri Eshwar College of Engineering", year: "2023" },
 ];

@@ -4,12 +4,12 @@ import { AnimatePresence, motion, useMotionValue, useSpring } from "motion/react
 import { useEffect, useState } from "react";
 import { useFinePointer, usePrefersReducedMotion } from "@/lib/hooks";
 
-type Mode = "default" | "hover" | "view";
+type Mode = { kind: "default" | "hover" | "label"; label?: string };
 
 /**
- * Custom cursor for fine pointers. A small dot follows the pointer exactly and a
- * ring lags behind on a spring. Interactive elements expand the ring; elements
- * marked data-cursor="view" show a label.
+ * Technical cursor for fine pointers: a small square dot with a lagging ring.
+ * Elements with data-cursor="<LABEL>" show the label (e.g. VIEW SYSTEM, INSPECT).
+ * Disabled on touch devices and under reduced motion.
  */
 export function Cursor() {
   const fine = useFinePointer();
@@ -18,9 +18,9 @@ export function Cursor() {
 
   const x = useMotionValue(-100);
   const y = useMotionValue(-100);
-  const rx = useSpring(x, { stiffness: 320, damping: 28, mass: 0.5 });
-  const ry = useSpring(y, { stiffness: 320, damping: 28, mass: 0.5 });
-  const [mode, setMode] = useState<Mode>("default");
+  const rx = useSpring(x, { stiffness: 380, damping: 30, mass: 0.4 });
+  const ry = useSpring(y, { stiffness: 380, damping: 30, mass: 0.4 });
+  const [mode, setMode] = useState<Mode>({ kind: "default" });
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
@@ -33,13 +33,13 @@ export function Cursor() {
       y.set(e.clientY);
       setVisible(true);
       const target = e.target as HTMLElement | null;
-      const view = target?.closest("[data-cursor='view']");
-      if (view) {
-        setMode("view");
+      const labelled = target?.closest<HTMLElement>("[data-cursor]");
+      if (labelled?.dataset.cursor) {
+        setMode({ kind: "label", label: labelled.dataset.cursor });
         return;
       }
-      const interactive = target?.closest("a, button, [role='button'], input, textarea, select, label");
-      setMode(interactive ? "hover" : "default");
+      const interactive = target?.closest("a, button, [role='button'], input, textarea, select, label, summary");
+      setMode({ kind: interactive ? "hover" : "default" });
     }
     function onLeave() {
       setVisible(false);
@@ -55,40 +55,38 @@ export function Cursor() {
 
   if (!enabled) return null;
 
-  const size = mode === "view" ? 72 : mode === "hover" ? 44 : 28;
+  const size = mode.kind === "label" ? 28 : mode.kind === "hover" ? 34 : 22;
 
   return (
     <>
       <motion.div
         aria-hidden
-        className="pointer-events-none fixed left-0 top-0 z-[70] h-1.5 w-1.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-text"
+        className="pointer-events-none fixed top-0 left-0 z-[70] h-1.5 w-1.5 -translate-x-1/2 -translate-y-1/2 bg-text"
         style={{ x, y, opacity: visible ? 1 : 0 }}
       />
       <motion.div
         aria-hidden
-        className="pointer-events-none fixed left-0 top-0 z-[70] flex -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-text/60 font-mono text-[10px] font-medium uppercase tracking-[0.18em] text-bg"
+        className="pointer-events-none fixed top-0 left-0 z-[70] -translate-x-1/2 -translate-y-1/2 rounded-[3px] border border-text/50"
         style={{ x: rx, y: ry, opacity: visible ? 1 : 0 }}
-        animate={{
-          width: size,
-          height: size,
-          backgroundColor: mode === "view" ? "rgba(233,237,245,1)" : "rgba(233,237,245,0)",
-          borderColor: mode === "default" ? "rgba(233,237,245,0.55)" : "rgba(233,237,245,0.9)",
-        }}
-        transition={{ type: "spring", stiffness: 300, damping: 24 }}
-      >
-        <AnimatePresence>
-          {mode === "view" ? (
-            <motion.span
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.8 }}
-              transition={{ duration: 0.18 }}
-            >
-              View
-            </motion.span>
-          ) : null}
-        </AnimatePresence>
-      </motion.div>
+        animate={{ width: size, height: size, borderColor: mode.kind === "default" ? "rgba(230,232,235,0.45)" : "rgba(47,155,255,0.9)" }}
+        transition={{ type: "spring", stiffness: 320, damping: 26 }}
+      />
+      <AnimatePresence>
+        {mode.kind === "label" ? (
+          <motion.span
+            aria-hidden
+            key={mode.label}
+            initial={{ opacity: 0, y: 4 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 4 }}
+            transition={{ duration: 0.16 }}
+            className="pointer-events-none fixed top-0 left-0 z-[70] translate-x-4 translate-y-4 border border-accent/60 bg-bg px-2 py-0.5 font-mono text-[10px] tracking-[0.16em] text-accent uppercase"
+            style={{ x: rx, y: ry }}
+          >
+            {mode.label}
+          </motion.span>
+        ) : null}
+      </AnimatePresence>
     </>
   );
 }

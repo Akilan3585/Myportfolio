@@ -1,31 +1,31 @@
-import { person } from "@/content/resume";
+import { person, site } from "@/content/resume";
 
-export function Footer() {
+export function Footer({ builtAt }: { builtAt: string }) {
   return (
     <footer className="border-t border-line">
-      <div className="mx-auto flex max-w-[1240px] flex-col gap-4 px-5 py-8 font-mono text-[12.5px] text-faint sm:flex-row sm:items-center sm:justify-between sm:px-8">
+      <div className="mx-auto flex max-w-[1240px] flex-col gap-4 px-5 py-6 font-mono text-[12px] text-faint sm:flex-row sm:items-center sm:justify-between sm:px-8">
         <p>
-          © {new Date().getFullYear()} {person.name}. Built with Next.js, Tailwind and Motion, deployed on Vercel.
+          © {new Date().getFullYear()} {person.name} · v{site.version} · built {builtAt} · Next.js, Tailwind, Motion, Vercel
         </p>
         <ul className="flex flex-wrap gap-x-5 gap-y-2">
           <li>
             <a href={person.github} target="_blank" rel="noreferrer" className="link-ul hover:text-text">
-              GitHub
+              github
             </a>
           </li>
           <li>
             <a href={person.linkedin} target="_blank" rel="noreferrer" className="link-ul hover:text-text">
-              LinkedIn
+              linkedin
             </a>
           </li>
           <li>
             <a href={person.leetcode} target="_blank" rel="noreferrer" className="link-ul hover:text-text">
-              LeetCode
+              leetcode
             </a>
           </li>
           <li>
             <a href="#top" className="link-ul hover:text-text">
-              Back to top
+              top ↑
             </a>
           </li>
         </ul>
